@@ -148,7 +148,7 @@
     $script:NetboxConfig.Connected = $true
     Write-Verbose "Successfully connected!"
 
-    $script:NetboxConfig.ContentTypes = Get-NetboxContentType -Limit 500
+    $script:NetboxConfig.ObjectTypes = Get-NetboxObjectType -Limit 500
 
     Write-Verbose "Connection process completed"
 }
