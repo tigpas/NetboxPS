@@ -230,6 +230,41 @@ function Add-NetboxDCIMRearPort {
 
 #endregion
 
+#region File Add-NetboxVirtualMachinedisk.ps1
+
+
+function Add-NetboxVirtualMachineDisk {
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+
+        [Parameter(Mandatory = $true)]
+        [uint64]$Virtual_Machine,
+
+        [string]$MAC_Address,
+
+        [uint64]$Size,
+
+        [string]$Description,
+
+        [switch]$Raw
+    )
+
+    $Segments = [System.Collections.ArrayList]::new(@('virtualization', 'virtual-disks'))
+
+    $PSBoundParameters.Enabled = $Enabled
+
+    $URIComponents = BuildURIComponents -URISegments $Segments -ParametersDictionary $PSBoundParameters
+
+    $uri = BuildNewURI -Segments $URIComponents.Segments
+
+    InvokeNetboxRequest -URI $uri -Method POST -Body $URIComponents.Parameters
+}
+
+#endregion
+
 #region File Add-NetboxVirtualMachineInterface.ps1
 
 
@@ -3375,6 +3410,84 @@ function Get-NetboxVirtualMachine {
 
 #endregion
 
+#region File Get-NetboxVirtualMachinedisk.ps1
+
+
+function Get-NetboxVirtualMachineDisk {
+    <#
+    .SYNOPSIS
+        Gets VM disks
+
+    .DESCRIPTION
+        Obtains the disk objects for one or more VMs
+
+    .PARAMETER Limit
+        Number of results to return per page.
+
+    .PARAMETER Offset
+        The initial index from which to return the results.
+
+    .PARAMETER Id
+        Database ID of the interface
+
+    .PARAMETER Name
+        Name of the disk
+
+    .PARAMETER Size
+        Size of the disk in GB
+
+    .PARAMETER Virtual_Machine_Id
+        ID of the virtual machine to which the interface(s) are assigned.
+
+    .PARAMETER Virtual_Machine
+        Name of the virtual machine to get interfaces
+
+    .PARAMETER Raw
+        A description of the Raw parameter.
+
+    .EXAMPLE
+        PS C:\> Get-NetboxVirtualMachineDisk
+
+    .NOTES
+        Additional information about the function.
+#>
+
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(ValueFromPipeline = $true)]
+        [uint64]$Id,
+
+        [string]$Name,
+
+        [string]$Query,
+
+        [uint64]$Size,
+
+        [uint64]$Virtual_Machine_Id,
+
+        [string]$Virtual_Machine,
+
+        [uint16]$Limit,
+
+        [uint16]$Offset,
+
+        [switch]$Raw
+    )
+
+    process {
+        $Segments = [System.Collections.ArrayList]::new(@('virtualization', 'virtual-disks'))
+
+        $URIComponents = BuildURIComponents -URISegments $Segments -ParametersDictionary $PSBoundParameters
+
+        $uri = BuildNewURI -Segments $URIComponents.Segments -Parameters $URIComponents.Parameters
+
+        InvokeNetboxRequest -URI $uri -Raw:$Raw
+    }
+}
+
+#endregion
+
 #region File Get-NetboxVirtualMachineInterface.ps1
 
 
@@ -6193,6 +6306,59 @@ function Set-NetboxVirtualMachine {
 
             InvokeNetboxRequest -URI $URI -Body $URIComponents.Parameters -Method PATCH
         }
+    }
+}
+
+#endregion
+
+#region File Set-NetboxVirtualMachinedisk.ps1
+
+
+function Set-NetboxVirtualMachineDisk {
+    [CmdletBinding(ConfirmImpact = 'Medium',
+                   SupportsShouldProcess = $true)]
+    [OutputType([pscustomobject])]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipelineByPropertyName = $true)]
+        [uint64[]]$Id,
+
+        [string]$Name,
+
+        [uint64]$Size,
+
+        [string]$Description,
+
+        [uint64]$Virtual_Machine,
+
+        [switch]$Force
+    )
+
+    begin {
+
+    }
+
+    process {
+        foreach ($VMI_ID in $Id) {
+            Write-Verbose "Obtaining VM virtual disk..."
+            $CurrentVMI = Get-NetboxVirtualMachinedisk -Id $VMI_ID -ErrorAction Stop
+            Write-Verbose "Finished obtaining VM disk"
+
+            $Segments = [System.Collections.ArrayList]::new(@('virtualization', 'virtual-disks', $CurrentVMI.Id))
+
+            if ($Force -or $pscmdlet.ShouldProcess("Disk $($CurrentVMI.Id) on VM $($CurrentVMI.Virtual_Machine.Name)", "Set")) {
+                $URIComponents = BuildURIComponents -URISegments $Segments -ParametersDictionary $PSBoundParameters -SkipParameterByName 'Id', 'Force'
+
+                $URI = BuildNewURI -Segments $URIComponents.Segments
+
+                InvokeNetboxRequest -URI $URI -Body $URIComponents.Parameters -Method PATCH
+            }
+        }
+    }
+
+    end {
+
     }
 }
 

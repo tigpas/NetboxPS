@@ -71,8 +71,8 @@ CLRVersion = '2.0.50727'
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Add-NetboxDCIMFrontPort', 'Add-NetboxDCIMInterface',
                'Add-NetboxDCIMInterfaceConnection', 'Add-NetboxDCIMRearPort',
-               'Add-NetboxVirtualMachineInterface', 'BuildNewURI',
-               'BuildURIComponents', 'CheckNetboxIsConnected',
+               'Add-NetboxVirtualMachinedisk', 'Add-NetboxVirtualMachineInterface',
+               'BuildNewURI', 'BuildURIComponents', 'CheckNetboxIsConnected',
                'Clear-NetboxCredential', 'Connect-NetboxAPI', 'CreateEnum',
                'Get-ModelDefinition', 'Get-NetboxAPIDefinition',
                'GetNetboxAPIErrorBody', 'Get-NetboxCircuit',
@@ -94,8 +94,8 @@ FunctionsToExport = 'Add-NetboxDCIMFrontPort', 'Add-NetboxDCIMInterface',
                'Get-NetboxTimeout', 'Get-NetboxVersion',
                'Get-NetboxVirtualizationCluster',
                'Get-NetboxVirtualizationClusterGroup', 'Get-NetboxVirtualMachine',
-               'Get-NetboxVirtualMachineInterface', 'InvokeNetboxRequest',
-               'New-NetboxCircuit', 'New-NetboxContact',
+               'Get-NetboxVirtualMachinedisk', 'Get-NetboxVirtualMachineInterface',
+               'InvokeNetboxRequest', 'New-NetboxCircuit', 'New-NetboxContact',
                'New-NetboxContactAssignment', 'New-NetboxContactRole',
                'New-NetboxDCIMDevice', 'New-NetboxDCIMSite', 'New-NetboxIPAMAddress',
                'New-NetboxIPAMAddressRange', 'New-NetboxIPAMPrefix',
@@ -114,9 +114,10 @@ FunctionsToExport = 'Add-NetboxDCIMFrontPort', 'Add-NetboxDCIMInterface',
                'Set-NetboxInvokeParams', 'Set-NetboxIPAMAddress',
                'Set-NetboxIPAMAddressRange', 'Set-NetboxIPAMPrefix',
                'Set-NetboxTimeout', 'Set-NetboxUnstrustedSSL',
-               'Set-NetboxVirtualMachine', 'Set-NetboxVirtualMachineInterface',
-               'SetupNetboxConfigVariable', 'Test-NetboxAPIConnected',
-               'ThrowNetboxRESTError', 'VerifyAPIConnectivity'
+               'Set-NetboxVirtualMachine', 'Set-NetboxVirtualMachinedisk',
+               'Set-NetboxVirtualMachineInterface', 'SetupNetboxConfigVariable',
+               'Test-NetboxAPIConnected', 'ThrowNetboxRESTError',
+               'VerifyAPIConnectivity'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
