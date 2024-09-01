@@ -6148,6 +6148,8 @@ function Set-NetboxVirtualMachine {
 
         [uint64]$Role,
 
+        [uint64]$Site,
+
         [uint64]$Cluster,
 
         [object]$Status,
