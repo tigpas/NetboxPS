@@ -4615,7 +4615,6 @@ function New-NetboxVirtualMachine {
         [Parameter(Mandatory = $true)]
         [string]$Name,
 
-        [Parameter(Mandatory = $true)]
         [uint64]$Site,
 
         [uint64]$Cluster,
@@ -4652,8 +4651,8 @@ function New-NetboxVirtualMachine {
 
     #$PSBoundParameters.Status = ValidateVirtualizationChoice -ProvidedValue $Status -VirtualMachineStatus
 
-    if ($PSBoundParameters.ContainsKey('Cluster') -and (-not $PSBoundParameters.ContainsKey('Site'))) {
-        throw "You must specify a site ID with a cluster ID"
+    if (-not $PSBoundParameters.ContainsKey('Cluster') -and (-not $PSBoundParameters.ContainsKey('Site'))) {
+        throw "A virtual machine must be assigned to a site and/or cluster."
     }
 
     $Segments = [System.Collections.ArrayList]::new(@('virtualization', 'virtual-machines'))
