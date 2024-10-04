@@ -284,6 +284,8 @@ function Add-NetboxVirtualMachineInterface {
 
         [uint16]$MTU,
 
+        [uint64]$VRF,
+
         [string]$Description,
 
         [switch]$Raw
@@ -3592,6 +3594,9 @@ function Get-NetboxVirtualMachineInterface {
     .PARAMETER MTU
         Maximum Transmission Unit size. Generally 1500 or 9000
 
+    .PARAMETER VRF
+        ID of the VRF of the interface(s).
+
     .PARAMETER Virtual_Machine_Id
         ID of the virtual machine to which the interface(s) are assigned.
 
@@ -3624,6 +3629,8 @@ function Get-NetboxVirtualMachineInterface {
         [boolean]$Enabled,
 
         [uint16]$MTU,
+
+        [uint64]$VRF,
 
         [uint64]$Virtual_Machine_Id,
 
@@ -6600,6 +6607,8 @@ function Set-NetboxVirtualMachineInterface {
         [string]$MAC_Address,
 
         [uint16]$MTU,
+
+        [uint64]$VRF,
 
         [string]$Description,
 

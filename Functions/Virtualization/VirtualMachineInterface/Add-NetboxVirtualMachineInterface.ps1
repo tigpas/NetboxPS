@@ -15,6 +15,8 @@ function Add-NetboxVirtualMachineInterface {
 
         [uint16]$MTU,
 
+        [uint64]$VRF,
+
         [string]$Description,
 
         [switch]$Raw
