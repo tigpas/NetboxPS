@@ -15,6 +15,8 @@ function Set-NetboxVirtualMachineInterface {
 
         [uint16]$MTU,
 
+        [uint64]$VRF,
+
         [string]$Description,
 
         [boolean]$Enabled,
