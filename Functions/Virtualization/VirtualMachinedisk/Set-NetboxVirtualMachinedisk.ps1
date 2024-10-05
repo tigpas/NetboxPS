@@ -17,6 +17,8 @@ function Set-NetboxVirtualMachineDisk {
 
         [uint64]$Virtual_Machine,
 
+        [hashtable]$Custom_Fields,
+
         [switch]$Force
     )
 

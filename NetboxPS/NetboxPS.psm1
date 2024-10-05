@@ -249,6 +249,8 @@ function Add-NetboxVirtualMachineDisk {
 
         [string]$Description,
 
+        [hashtable]$Custom_Fields,
+
         [switch]$Raw
     )
 
@@ -6556,6 +6558,8 @@ function Set-NetboxVirtualMachineDisk {
         [string]$Description,
 
         [uint64]$Virtual_Machine,
+
+        [hashtable]$Custom_Fields,
 
         [switch]$Force
     )
