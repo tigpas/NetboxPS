@@ -177,6 +177,45 @@ function Add-NetboxDCIMInterfaceConnection {
 
 #endregion
 
+#region File Add-NetboxDCIMPlatform.ps1
+
+function Add-NetboxDCIMPlatform {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+
+        [ValidateLength(1, 100)]
+        [ValidatePattern('^[-a-zA-Z0-9_]+$')]
+        [string]$Slug,
+
+        [uint64]$Manufacturer,
+
+        [uint64]$Config_Template,
+
+        [string]$Description,
+
+        [uint16[]]$Tags
+
+    )
+
+    $Segments = [System.Collections.ArrayList]::new(@('dcim', 'platforms'))
+
+    if (-not $PSBoundParameters.ContainsKey('slug')) {
+        $PSBoundParameters.Add('slug', $($name | Get-NetboxSlug))
+    }
+
+    $URIComponents = BuildURIComponents -URISegments $Segments.Clone() -ParametersDictionary $PSBoundParameters
+
+    $URI = BuildNewURI -Segments $URIComponents.Segments
+
+    InvokeNetboxRequest -URI $URI -Body $URIComponents.Parameters -Method POST
+}
+
+#endregion
+
 #region File Add-NetboxDCIMRearPort.ps1
 
 function Add-NetboxDCIMRearPort {
@@ -3024,6 +3063,27 @@ function Get-NetboxObjectType {
 
 #endregion
 
+#region File Get-NetboxSlug.ps1
+
+function Get-NetboxSlug {
+    param (
+        [Parameter(ValueFromPipeline)]
+        [string]$slug,
+
+        [uint16]$chars = 100
+    )
+
+    process {
+        return $slug -replace '[^\-.\w\s]', '' `
+                     -replace '[^a-zA-Z0-9-_ ]', '' `
+                     -replace '^[\s.]+|[\s.]+$', '' `
+                     -replace '[-.\s]+', '-' `
+                     | ForEach-Object { $_.ToLower().Substring(0, [Math]::Min($_.Length, $chars)) }
+    }
+}
+
+#endregion
+
 #region File Get-NetboxTag.ps1
 
 
@@ -5040,6 +5100,46 @@ function Remove-NetboxDCIMInterfaceConnection {
 
 #endregion
 
+#region File Remove-NetboxDCIMPlatform.ps1
+
+function Remove-NetboxDCIMPlatform {
+
+    [CmdletBinding(ConfirmImpact = 'High',
+        SupportsShouldProcess = $true)]
+    param
+    (
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [uint64[]]$Id,
+
+        [switch]$Force
+    )
+
+    begin {
+
+    }
+
+    process {
+        foreach ($PlatformID in $Id) {
+            $CurrentPlatform = Get-NetboxDCIMPlatform -Id $PlatformID -ErrorAction Stop
+
+            if ($Force -or $pscmdlet.ShouldProcess("Name: $($CurrentPlatform.Name) | ID: $($CurrentPlatform.Id)", "Remove")) {
+                $Segments = [System.Collections.ArrayList]::new(@('dcim', 'platforms', $CurrentPlatform.Id))
+
+                $URI = BuildNewURI -Segments $Segments
+
+                InvokeNetboxRequest -URI $URI -Method DELETE
+            }
+        }
+    }
+
+    end {
+
+    }
+}
+
+#endregion
+
 #region File Remove-NetboxDCIMRearPort.ps1
 
 function Remove-NetboxDCIMRearPort {
@@ -6029,6 +6129,62 @@ function Set-NetboxDCIMInterfaceConnection {
 
                 $URI = BuildNewURI -Segments $URIComponents.Segments
 
+                InvokeNetboxRequest -URI $URI -Body $URIComponents.Parameters -Method PATCH
+            }
+        }
+    }
+
+    end {
+
+    }
+}
+
+#endregion
+
+#region File Set-NetboxDCIMPlatform.ps1
+
+function Set-NetboxDCIMPlatform {
+    [CmdletBinding(ConfirmImpact = 'Medium',
+        SupportsShouldProcess = $true)]
+    [OutputType([pscustomobject])]
+    param
+    (
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [uint64[]]$Id,
+
+        [string]$Name,
+
+        [ValidateLength(1, 100)]
+        [ValidatePattern('^[-a-zA-Z0-9_]+$')]
+        [string]$Slug,
+
+        [uint64]$Manufacturer,
+
+        [uint64]$Config_Template,
+
+        [string]$Description,
+
+        [uint64[]]$Tags,
+
+        [switch]$Force
+    )
+
+    begin {
+
+    }
+
+    process {
+        foreach ($FrontPortID in $Id) {
+            $CurrentPlatform = Get-NetboxDCIMPlatform -Id $FrontPortID -ErrorAction Stop
+
+            $Segments = [System.Collections.ArrayList]::new(@('dcim', 'platforms', $CurrentPlatform.Id))
+
+            $URIComponents = BuildURIComponents -URISegments $Segments.Clone() -ParametersDictionary $PSBoundParameters -SkipParameterByName 'Id'
+
+            $URI = BuildNewURI -Segments $Segments
+
+            if ($Force -or $pscmdlet.ShouldProcess("Platform ID $($CurrentPlatform.Id)", "Set")) {
                 InvokeNetboxRequest -URI $URI -Body $URIComponents.Parameters -Method PATCH
             }
         }
