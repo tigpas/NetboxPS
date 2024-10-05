@@ -15,6 +15,8 @@ function Add-NetboxVirtualMachineDisk {
 
         [string]$Description,
 
+        [hashtable]$Custom_Fields,
+
         [switch]$Raw
     )
 
