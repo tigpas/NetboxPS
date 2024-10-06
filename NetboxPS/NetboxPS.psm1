@@ -269,6 +269,47 @@ function Add-NetboxDCIMRearPort {
 
 #endregion
 
+#region File Add-NetboxDCIMVirtualDeviceContext.ps1
+
+function Add-NetboxDCIMVirtualDeviceContext {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [uint64]$Device,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+
+        [object]$Status = 'active',
+
+        [uint16]$Identifier,
+
+        [uint64]$Primary_IP4,
+
+        [uint64]$Primary_IP6,
+
+        [uint64]$Tenant,
+
+        [string]$Comments
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('Status')) {
+        $PSBoundParameters['Status'] = $Status
+    }
+
+    $Segments = [System.Collections.ArrayList]::new(@('dcim', 'virtual-device-contexts'))
+
+    $URIComponents = BuildURIComponents -URISegments $Segments.Clone() -ParametersDictionary $PSBoundParameters
+
+    $URI = BuildNewURI -Segments $URIComponents.Segments
+
+    InvokeNetboxRequest -URI $URI -Body $URIComponents.Parameters -Method POST
+}
+
+#endregion
+
 #region File Add-NetboxVirtualMachinedisk.ps1
 
 
@@ -2114,6 +2155,50 @@ function Get-NetboxDCIMSite {
                 InvokeNetboxRequest -URI $URI -Raw:$Raw
             }
         }
+    }
+}
+
+#endregion
+
+#region File Get-NetboxDCIMVirtualDeviceContext.ps1
+
+function Get-NetboxDCIMVirtualDeviceContext {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param
+    (
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [uint64]$Id,
+
+        [string]$Name,
+
+        [object]$Status,
+
+        [uint16]$Identifier,
+
+        [string]$Device,
+
+        [uint64]$Device_Id,
+
+        [uint64]$Tenant_Id,
+
+        [string]$Tenant,
+
+        [uint16]$Limit,
+
+        [uint16]$Offset,
+
+        [switch]$Raw
+    )
+
+    process {
+        $Segments = [System.Collections.ArrayList]::new(@('dcim', 'virtual-device-contexts'))
+
+        $URIComponents = BuildURIComponents -URISegments $Segments.Clone() -ParametersDictionary $PSBoundParameters
+
+        $URI = BuildNewURI -Segments $URIComponents.Segments -Parameters $URIComponents.Parameters
+
+        InvokeNetboxRequest -URI $URI -Raw:$Raw
     }
 }
 
@@ -5249,6 +5334,45 @@ function Remove-NetboxDCIMSite {
 
 #endregion
 
+#region File Remove-NetboxDCIMVirtualDeviceContext.ps1
+
+function Remove-NetboxDCIMVirtualDeviceContext {
+    [CmdletBinding(ConfirmImpact = 'High',
+        SupportsShouldProcess = $true)]
+    param
+    (
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [uint64[]]$Id,
+
+        [switch]$Force
+    )
+
+    begin {
+
+    }
+
+    process {
+        foreach ($VirtualDeviceContextId in $Id) {
+            $CurrentVirtualDeviceContext = Get-NetboxDCIMVirtualDeviceContext -Id $VirtualDeviceContextId -ErrorAction Stop
+
+            if ($Force -or $pscmdlet.ShouldProcess("Name: $($CurrentVirtualDeviceContext.Name) | ID: $($CurrentVirtualDeviceContext.Id)", "Remove")) {
+                $Segments = [System.Collections.ArrayList]::new(@('dcim', 'virtual-device-contexts', $CurrentVirtualDeviceContext.Id))
+
+                $URI = BuildNewURI -Segments $Segments
+
+                InvokeNetboxRequest -URI $URI -Method DELETE
+            }
+        }
+    }
+
+    end {
+
+    }
+}
+
+#endregion
+
 #region File Remove-NetboxIPAMAddress.ps1
 
 
@@ -6256,6 +6380,56 @@ function Set-NetboxDCIMRearPort {
 
     end {
 
+    }
+}
+
+#endregion
+
+#region File Set-NetboxDCIMVirtualDeviceContext.ps1
+
+function Set-NetboxDCIMVirtualDeviceContext {
+    [CmdletBinding(ConfirmImpact = 'Medium',
+        SupportsShouldProcess = $true)]
+    [OutputType([pscustomobject])]
+    param
+    (
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [uint64[]]$Id,
+
+        [string]$Name,
+
+        [object]$Status,
+
+        [uint16]$Identifier,
+
+        [uint64]$Device,
+
+        [uint64]$Primary_IP4,
+
+        [uint64]$Primary_IP6,
+
+        [uint64]$Tenant,
+
+        [string]$Comments,
+
+        [switch]$Force
+    )
+
+    process {
+        foreach ($VirtualDeviceContextId in $Id) {
+            $CurrentVirtualDeviceContext = Get-NetboxDCIMVirtualDeviceContext -Id $VirtualDeviceContextId -ErrorAction Stop
+
+            $Segments = [System.Collections.ArrayList]::new(@('dcim', 'virtual-device-contexts', $CurrentVirtualDeviceContext.Id))
+
+            $URIComponents = BuildURIComponents -URISegments $Segments.Clone() -ParametersDictionary $PSBoundParameters -SkipParameterByName 'Id'
+
+            $URI = BuildNewURI -Segments $Segments
+
+            if ($Force -or $pscmdlet.ShouldProcess("Virtual Device Context ID $($CurrentVirtualDeviceContext.Id)", "Set")) {
+                InvokeNetboxRequest -URI $URI -Body $URIComponents.Parameters -Method PATCH
+            }
+        }
     }
 }
 
